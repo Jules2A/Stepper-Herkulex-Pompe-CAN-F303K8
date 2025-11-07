@@ -264,13 +264,13 @@ void get_all_servo_pos(
   short *pos_servo_pivot_pince)
 {
   // range les pos des servos en ° dans les variables
-  *pos_servo_pivot_gauche = (Pivot_gauche.getPosition() - 512) * 0.325;
-  *pos_servo_pivot_droit = (Pivot_droit.getPosition() - 512) * 0.325;
-  *pos_servo_aimant_droit = (Aimant_droit.getPosition() - 512) * 0.325;
+  *pos_servo_pivot_gauche  = (Pivot_gauche.getPosition() - 512) * 0.325;
+  *pos_servo_pivot_droit   = (Pivot_droit.getPosition() - 512) * 0.325;
+  *pos_servo_aimant_droit  = (Aimant_droit.getPosition() - 512) * 0.325;
   *pos_servo_aimant_gauche = (Aimant_gauche.getPosition() - 512) * 0.325;
   *pos_servo_aimant_centre = (Aimant_centre.getPosition() - 512) * 0.325;
   *pos_servo_pince = (Pince.getPosition() - 512) * 0.325;
-  *pos_servo_pivot_pince = (Pivot_pince.getPosition() - 512) * 0.325;
+  *pos_servo_pivot_pince   = (Pivot_pince.getPosition() - 512) * 0.325;
 }
 
 void restart_all_servo(void){
