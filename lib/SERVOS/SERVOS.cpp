@@ -15,6 +15,8 @@ HerkulexServo servo_serr(herkulex_bus, SERVO_SERRAGE);
 unsigned long last_update = 0; // Stocke le temps de la dernière mise à jour
 unsigned long now = 0;         // Stocke le temps actuel
 bool toggle = false;           // Booléen pour alterner entre deux positions
+char etat_rota=0;              // État actuel de la rotation du servo (0 -> 0°, 1 -> 90°, 2 -> 180°)
+
 // Variables pour la position du servo
 int pos, pos_angle;
 
@@ -24,6 +26,43 @@ void init_serial_1_for_herkulex()
   Serial1.setTx(PIN_SW_TX); // Associe la broche TX à l'UART1
   Serial1.begin(115200);    // Initialise la communication série à 115200 bauds
   all_servo.setTorqueOn();   // Active le couple du servo (mise sous tension)
+}
+
+void serrer(void)
+{
+  servo_serr.setPosition(ATTRAPE, 50, HerkulexLed::Green); // Ouvre la pince
+  herkulex_bus.executeMove();
+  delay(200); // Attente de 225 ms
+}
+
+void desserer(void)
+{
+  servo_serr.setPosition(RELACHE, 50, HerkulexLed::Blue); // Ouvre la pince
+  herkulex_bus.executeMove();
+  delay(200); // Attente de 225 ms
+}
+
+void tourner(void)
+{
+  switch(etat_rota)
+  {
+    case 0:
+      servo_rota.setPosition(ANGLE0, 50, HerkulexLed::Green); // Position 0°
+      etat_rota = 1;
+      break;
+    case 1:
+      servo_rota.setPosition(ANGLE90, 50, HerkulexLed::Blue); // Position 90°
+      etat_rota = 2;
+      break;
+    case 2:
+      servo_rota.setPosition(ANGLE180, 50, HerkulexLed::Red); // Position 180°
+      etat_rota = 3;
+      break;
+    case 3:
+      servo_rota.setPosition(ANGLE90, 50, HerkulexLed::Red); // Position 180°
+      etat_rota = 0;
+      break;
+  }
 }
 
 void test_herkulex()
@@ -77,32 +116,20 @@ int detect_id(bool activate)
     {
       HerkulexPacket resp; // Stocke la réponse du servo
       bool success = herkulex_bus.sendPacketAndReadResponse(resp, id, HerkulexCommand::Stat);
-
       if (success)
       {
         servos_found++; // Incrémente le compteur si un servo est trouvé
-
         // Affichage de l'ID au format hexadécimal
-        if (id <= 0x0F)
-        {
-          Serial.print("0"); // Ajoute un "0" pour l'alignement des nombres
-        }
-
+        if (id <= 0x0F) { Serial.print("0"); } // Ajoute un "0" pour l'alignement des nombres
         Serial.print(id, HEX);
       }
       else
-      {
-        Serial.print("--"); // Affiche "--" si aucun servo n'est détecté
-      }
+      { Serial.print("--"); }// Affiche "--" si aucun servo n'est détecté
       // Saut de ligne toutes les 15 adresses affichées
       if (((id + 1) % 0x0F) == 0)
-      {
-        Serial.println();
-      }
+      { Serial.println(); }
       else
-      {
-        Serial.print(" ");
-      }
+      { Serial.print(" "); }
     }
     // Affichage du nombre total de servos trouvés
     Serial.println();
@@ -114,9 +141,7 @@ int detect_id(bool activate)
     return 0xFD; // Retourne l'adresse de diffusion (broadcast ID)
   }
   else
-  {
-    return 0; // Retourne 0 si la détection est désactivée
-  }
+  { return 0; }// Retourne 0 si la détection est désactivée
 }
 
 // affiche la position en °

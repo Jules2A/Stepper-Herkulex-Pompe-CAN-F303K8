@@ -1,20 +1,35 @@
-#ifndef _HERKULEX_H
-#define _HERKULEX_H
+#ifndef _SERVOS_H
+#define _SERVOS_H
+
 #include <HardwareSerial.h>
 #include <HerkulexServo.h>
 
-// Définition des identifiants des servos Herkulex utilisés dans le projet
-#define HERKULEX_BROADCAST_ID 0xFE // ID de diffusion pour tous les servos
-#define SERVO_SERRAGE 0x04 
+// Définitions d'ID et positions
+#define HERKULEX_BROADCAST_ID 0xFE
+#define SERVO_SERRAGE 0x04
 #define SERVO_ROTATION 0x06
 
-// Définition des positions et angles pour les mouvements des servos
-#define ATTRAPE 200 
-#define RELACHE 800 // à vérifier
+#define ATTRAPE 200
+#define RELACHE 800
+#define ANGLE0 276
+#define ANGLE90 552
+#define ANGLE180 829
 
+// Broches série
+#define PIN_SW_RX PB7
+#define PIN_SW_TX PB6
 
+// Déclarations extern des objets définis dans SERVOS.cpp
+extern HardwareSerial Serial1;
+extern HerkulexServoBus herkulex_bus;
+extern HerkulexServo all_servo;
+extern HerkulexServo servo_rota;
+extern HerkulexServo servo_serr;
 
-
+// Prototypes de fonctions
+void serrer(void);
+void desserer(void);
+void tourner(void);
 
 void change_id(uint8_t id, HerkulexServo old_, HerkulexServo new_);
 void init_serial_1_for_herkulex();
@@ -34,18 +49,4 @@ void get_all_servo_pos(
     short *pos_servo_pince,
     short *pos_servo_pivot_pince);
 
-#endif
-
-// Définition des broches utilisées pour la communication série avec les servos Herkulex
-#define PIN_SW_RX PB7 // Broche utilisée pour la réception (RX)
-#define PIN_SW_TX PB6 // Broche utilisée pour la transmission (TX)
-
-
-/*
-    J'ai décalé les créations d'objet et define ici pour y avoir accès partout
-    Comme ça je peux aussi m'en servir dans le main au lieu de recréer des objets
-    et créer un problème avec 2 fois le même objet mais qui n'a pas le même nom
-*/
-
-
-// Création d'un objet servo avec l'adresse de diffusion (HERKULEX_BROADCAST_ID signifie tous les servos connectés)
+#endif // _SERVOS_H
